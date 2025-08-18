@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35828.75 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JogoDaVelha.Core", "JogoDaVelha.Core\JogoDaVelha.Core.csproj", "{989AA299-B7B3-486F-B6E1-55A8F0CCC8DB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JogoDaVelha.UI", "JogoDaVelha.UI\JogoDaVelha.UI.csproj", "{1AC1E40F-0A1F-4D47-9836-A9920592562A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{989AA299-B7B3-486F-B6E1-55A8F0CCC8DB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{989AA299-B7B3-486F-B6E1-55A8F0CCC8DB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{989AA299-B7B3-486F-B6E1-55A8F0CCC8DB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{989AA299-B7B3-486F-B6E1-55A8F0CCC8DB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1AC1E40F-0A1F-4D47-9836-A9920592562A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1AC1E40F-0A1F-4D47-9836-A9920592562A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1AC1E40F-0A1F-4D47-9836-A9920592562A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1AC1E40F-0A1F-4D47-9836-A9920592562A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3ADC2F5B-D901-4079-A95D-A7950CDABED8}
+	EndGlobalSection
+EndGlobal

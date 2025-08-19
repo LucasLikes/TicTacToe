@@ -1,10 +1,10 @@
 ﻿using System.Windows.Controls;
 
 namespace JogoDaVelha.UI.Views;
-    public partial class GameView : UserControl
+public partial class GameView : UserControl
+{
+    public GameView()
     {
-        public GameView()
-        {
-            InitializeComponent();
-        }
+        InitializeComponent();
     }
+}

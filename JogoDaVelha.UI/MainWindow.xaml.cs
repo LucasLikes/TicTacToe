@@ -1,4 +1,5 @@
-﻿using JogoDaVelha.UI.Views;
+﻿using JogoDaVelha.UI.ViewModels;
+using JogoDaVelha.UI.Views;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,21 +12,43 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace JogoDaVelha.UI;
-
-/// <summary>
-/// Interaction logic for MainWindow.xaml
-/// </summary>
 public partial class MainWindow : Window
 {
     public MainWindow()
     {
         InitializeComponent();
-        ShowMainMenu();  // Chama o método para exibir o menu inicial
+        ShowMainMenu();
     }
 
     private void ShowMainMenu()
     {
-        var mainMenu = new MainMenu();  // Substitua "MainMenu" com o nome correto da sua View
-        MainContent.Content = mainMenu;  // Carrega o conteúdo no ContentControl
+        var vm = new MainMenuViewModel(
+            onPlayPvp: () => ShowGame("PvP"),  // Quando "Jogar PvP" é clicado, chama o método ShowGame
+            onPlayCpuEasy: () => ShowGame("CpuEasy"),
+            onPlayCpuHard: () => ShowGame("CpuHard"),
+            onOpenRanking: ShowRanking,
+            onExit: () => Close()
+        );
+
+        MainContent.Content = new MainMenu { DataContext = vm };
+    }
+
+    private void ShowGame(string mode)
+    {
+        var vm = new GameViewModel(
+            onBackToMenu: ShowMainMenu
+        );
+
+        // Aqui você pode passar o "mode" para o ViewModel se quiser
+        MainContent.Content = new GameView { DataContext = vm };
+    }
+
+    private void ShowRanking()
+    {
+        var vm = new RankingViewModel(
+            onBackToMenu: ShowMainMenu
+        );
+
+        MainContent.Content = new RankingView { DataContext = vm };
     }
 }

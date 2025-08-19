@@ -1,14 +1,8 @@
-﻿using JogoDaVelha.Core.Game;
-using System;
-using System.Collections.Generic;
+﻿using JogoDaVelha.UI;
 using System.ComponentModel;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
 
-namespace JogoDaVelha.UI.ViewModels;
 public class GameViewModel : INotifyPropertyChanged
 {
     private readonly GameManager _gameManager;
@@ -43,24 +37,41 @@ public class GameViewModel : INotifyPropertyChanged
         }
     }
 
-    private void MakeMove(int position)
+    private void MakeMove(object param)
     {
-        int row = position / 3;
-        int col = position % 3;
-
-        if (_gameManager.MakeMove(row, col))
+        if (param is int position)
         {
-            UpdateBoard();
+            int row = position / 3;
+            int col = position % 3;
 
-            if (_gameManager.IsGameOver)
+            if (_gameManager.MakeMove(row, col))
             {
-                CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "X wins!" : "O wins!";
-            }
-            else
-            {
-                CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "Player X's turn" : "Player O's turn";
+                UpdateBoard();
+
+                if (_gameManager.IsGameOver)
+                {
+                    if (CheckForTie())
+                    {
+                        CurrentPlayerText = "It's a tie!";
+                    }
+                    else
+                    {
+                        CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "X wins!" : "O wins!";
+                    }
+                }
+                else
+                {
+                    CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "Player X's turn" : "Player O's turn";
+                }
             }
         }
+    }
+
+
+    private bool CheckForTie()
+    {
+        // Verifica se todas as casas estão preenchidas e o jogo não acabou
+        return !_gameManager.Board.Cast<GameManager.Player>().Any(cell => cell == GameManager.Player.None);
     }
 
     private void NewGame()

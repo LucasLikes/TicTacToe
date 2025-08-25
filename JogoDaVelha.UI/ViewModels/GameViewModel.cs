@@ -2,10 +2,17 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
+using JogoDaVelha.Core.Logging;
+using System.Text.Json;
+using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+
 
 public class GameViewModel : INotifyPropertyChanged
 {
     private readonly GameManager _gameManager;
+    private List<MoveData> _gameHistory = new();
     private string[] _board;
     private string _currentPlayerText;
 
@@ -19,7 +26,13 @@ public class GameViewModel : INotifyPropertyChanged
     {
         _gameManager = new GameManager();
         _board = new string[9];
-        PlayCommand = new RelayCommand(param => MakeMove(Convert.ToInt32(param)));
+        PlayCommand = new RelayCommand(async param =>
+        {
+            if (int.TryParse(param?.ToString(), out int pos))
+            {
+                await MakeMoveAsync(pos);
+            }
+        });
         NewGameCommand = new RelayCommand(param => NewGame());
         BackCommand = new RelayCommand(param => onBackToMenu());
 
@@ -37,36 +50,81 @@ public class GameViewModel : INotifyPropertyChanged
         }
     }
 
-    private void MakeMove(object param)
+
+
+    private async Task MakeMoveAsync(int position)
     {
-        if (param is int position)
+        int row = position / 3;
+        int col = position % 3;
+
+        // Copia o estado atual do tabuleiro
+        string[] stateSnapshot = new string[9];
+        for (int i = 0; i < 9; i++)
         {
-            int row = position / 3;
-            int col = position % 3;
+            var player = _gameManager.Board[i / 3, i % 3];
+            stateSnapshot[i] = player == GameManager.Player.None ? " " : player.ToString();
+        }
 
-            if (_gameManager.MakeMove(row, col))
+        if (_gameManager.MakeMove(row, col))
+        {
+            _gameHistory.Add(new MoveData
             {
-                UpdateBoard();
+                State = stateSnapshot,
+                Action = position,
+                Player = _gameManager.CurrentPlayer == GameManager.Player.X ? "O" : "X"
+            });
 
-                if (_gameManager.IsGameOver)
+            UpdateBoard();
+
+            if (_gameManager.IsGameOver)
+            {
+                string winner = CheckForTie() ? "None" : (_gameManager.CurrentPlayer == GameManager.Player.X ? "O" : "X");
+
+                CurrentPlayerText = winner == "None" ? "Empateeeee!" : $"{winner} Venceu!";
+
+                var gameLog = new GameLog
                 {
-                    if (CheckForTie())
-                    {
-                        CurrentPlayerText = "Empateeeee!";
-                    }
-                    else
-                    {
-                        CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "X Venceu!" : "O Venceu!";
-                    }
-                }
-                else
-                {
-                    CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "Vez Player X" : "Vez Player O";
-                }
+                    History = _gameHistory,
+                    Winner = winner
+                };
+
+                await SendGameLogToPythonAsync(gameLog);
+
+                var json = JsonSerializer.Serialize(gameLog, new JsonSerializerOptions { WriteIndented = true });
+                File.WriteAllText("last_game.json", json);
+            }
+            else
+            {
+                CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "Vez Player X" : "Vez Player O";
             }
         }
     }
 
+
+    private async Task SendGameLogToPythonAsync(GameLog gameLog)
+    {
+        using var client = new HttpClient();
+
+        string json = JsonSerializer.Serialize(gameLog);
+        var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+        try
+        {
+            var response = await client.PostAsync("http://localhost:5000/api/logs", content); // ← Arrumar o URI...(Criar no Py)
+            if (response.IsSuccessStatusCode)
+            {
+                Console.WriteLine("Log enviado com sucesso!");
+            }
+            else
+            {
+                Console.WriteLine($"Erro ao enviar log: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exceção ao enviar log: {ex.Message}");
+        }
+    }
 
     private bool CheckForTie()
     {
@@ -77,6 +135,7 @@ public class GameViewModel : INotifyPropertyChanged
     private void NewGame()
     {
         _gameManager.ResetBoard();
+        _gameHistory.Clear();
         UpdateBoard();
         CurrentPlayerText = "Player X sua vez!";
     }

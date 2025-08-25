@@ -19,7 +19,7 @@ public class GameViewModel : INotifyPropertyChanged
     {
         _gameManager = new GameManager();
         _board = new string[9];
-        PlayCommand = new RelayCommand(param => MakeMove((int)param));
+        PlayCommand = new RelayCommand(param => MakeMove(Convert.ToInt32(param)));
         NewGameCommand = new RelayCommand(param => NewGame());
         BackCommand = new RelayCommand(param => onBackToMenu());
 
@@ -52,16 +52,16 @@ public class GameViewModel : INotifyPropertyChanged
                 {
                     if (CheckForTie())
                     {
-                        CurrentPlayerText = "It's a tie!";
+                        CurrentPlayerText = "Empateeeee!";
                     }
                     else
                     {
-                        CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "X wins!" : "O wins!";
+                        CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "X Venceu!" : "O Venceu!";
                     }
                 }
                 else
                 {
-                    CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "Player X's turn" : "Player O's turn";
+                    CurrentPlayerText = _gameManager.CurrentPlayer == GameManager.Player.X ? "Vez Player X" : "Vez Player O";
                 }
             }
         }
@@ -78,7 +78,7 @@ public class GameViewModel : INotifyPropertyChanged
     {
         _gameManager.ResetBoard();
         UpdateBoard();
-        CurrentPlayerText = "Player X's turn";
+        CurrentPlayerText = "Player X sua vez!";
     }
 
     private void UpdateBoard()
